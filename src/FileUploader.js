@@ -1,10 +1,11 @@
-import React,{useState} from 'react'
+import React,{useEffect, useState} from 'react'
 import {
     Form,
     Button,
     Upload,
     Typography,
-    Modal
+    Modal,
+    Input
   } from 'antd';
   import { InboxOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -28,10 +29,11 @@ import axios from 'axios';
 
     const [file,setFile] = useState({})
     const [loading,setLoading] = useState(false)
+    const [apiUrl,setApiUrl] = useState('')
+    const [input,setInput] = useState(true)
     const [blockButton,setBlockButton] = useState(true)
     const [viewModal, setViewModal] = useState(false)
     const [resData, setResData] = useState('')
-
 
     const handleUpload = ({ fileList }) => {
         //---------------^^^^^----------------
@@ -56,7 +58,7 @@ import axios from 'axios';
         formData.append("file", file.fileList[0].originFileObj);
     
         axios
-          .post(`${process.env.REACT_APP_SCANNER_URI}/DOC/v1/scan`, formData)
+          .post(`${apiUrl}/DOC/v1/scan`, formData)
           .then(res => {
             console.log("res", res);
             setResData(res.data.original)
@@ -67,9 +69,20 @@ import axios from 'axios';
             console.log("err", err);
           });
       };
+
+    const handleURI=(event) => {
+        event.preventDefault();
+        setApiUrl(event.target.value)
+    }
   
     return (
     <>
+      <Modal
+       title='Enter API URI'
+       visible={input}
+       onOk={ () => setInput(false)}>
+           <Input placeholder='Enter the backend URI' onChange={handleURI} />
+      </Modal>
       <Form
         name="validate_other"
         {...formItemLayout}
